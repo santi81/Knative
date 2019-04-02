@@ -1,0 +1,31 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: model-from-source
+  namespace: default
+spec:
+  runLatest:
+    configuration:
+      build:
+        apiVersion: build.knative.dev/v1alpha1
+        kind: Build
+        spec:
+          serviceAccountName: build-bot
+          source:
+            git:
+              url: https://github.com/santi81/mlf-python-grpc-model-server.git
+              revision: master
+          template:
+            name: kaniko
+            arguments:
+              - name: IMAGE
+                value: docker.io/81santi81/model-from-source:latest
+          timeout: 10m
+      revisionTemplate:
+        spec:
+          container:
+            image: docker.io/81santi81/model-from-source:latest
+            imagePullPolicy: Always
+            ports:
+              - name: h2c
+                containerPort: 9000
