@@ -1,0 +1,23 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: helloworld-python
+  namespace: default
+spec:
+  release:
+   revisions:
+     - helloworld-python-kqd68
+     - helloworld-python-btj9b
+   rolloutPercent: 50
+   configuration:
+      revisionTemplate:
+        metadata:
+          annotations:
+            autoscaling.knative.dev/minScale: "1"
+            autoscaling.knative.dev/target: "10"
+        spec:
+          container:
+            image: docker.io/81santi81/helloworld-python
+            env:
+            - name: TARGET
+              value: "Python Sample v3"
